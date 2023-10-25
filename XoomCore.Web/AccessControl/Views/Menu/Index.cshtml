@@ -1,0 +1,265 @@
+﻿@{
+    ViewData["Title"] = "Menu";
+}
+
+<div class="row">
+    <!-- Table -->
+    <div class="card">
+        <div class="row border-bottom">
+            <div class="col-6 text-start">
+                <h5 class="card-header">Menu</h5>
+            </div>
+            <div class="col-6 text-end mt-3">
+                <button class="btn btn-primary" type="button" id="addButton" disabled><span><i class="bx bx-plus"></i> Create New</span></button>
+            </div>
+        </div>
+
+        <div class="text-nowrap" id="tableDiv">
+        </div>
+    </div>
+    <!--/ Table -->
+</div>
+
+@section scripts{
+
+    <script>
+        (async () => {
+            let updatePermission = false;
+            let deletePermission = false;
+            const addButton = document.getElementById('addButton');
+
+            async function getPermittedMenuItem() {
+                const apiUrl = '/Menu/GetPermittedSubMenu';
+                const response = await sendRequest(apiUrl, 'GET');
+
+                if (response.isValid) {
+                    updatePermission = response.data.edit;
+                    deletePermission = response.data.delete;
+                    if (response.data.create) {
+                        addButton.disabled = false;
+                    }
+
+                }
+            }
+            await getPermittedMenuItem();
+
+            //
+            let tableConfig = {
+                itemsPerPage: 10,
+                totalItems: 10,
+                searchText: "",
+                currentPage: 1,
+                limitValues: ['10', '25', '50', '100'],
+                columns: [
+                    { key: 'name', label: 'Name' },
+                    { key: 'description', label: 'Description' },
+                    { key: 'icon', label: 'Icon' },
+                    { key: 'displaySequence', label: 'DisplaySequence' },
+                    {
+                        key: 'status',
+                        label: 'Status',
+                        renderElement: rowData => getStatusElement(rowData, 'status'),
+                    },
+                    // Add more columns as needed
+                ],
+                actionButtons: [
+                    {
+                        label: 'Edit',
+                        icon: 'bx-edit',
+                        style: 'btn-outline-primary me-1',
+                        enabled: updatePermission,
+                        action: (rowData) => showDataForEdit(rowData),
+                    },
+                    {
+                        label: 'Delete',
+                        icon: 'bx-trash',
+                        style: 'btn-outline-danger me-1',
+                        enabled: deletePermission,
+                        action: (rowData) => showDataForDelete(rowData),
+
+                    }
+                    // Add more action buttons as needed
+                ],
+
+                filterAction: (filterData) => showDataForFilter(filterData)
+            }
+            // Fetch data and generate the table
+            async function getData() {
+                try {
+                    const startFrom = (tableConfig.currentPage - 1) * tableConfig.itemsPerPage + 1;
+                    const noOfRecordsToFetch = tableConfig.itemsPerPage;
+                    const searchText = tableConfig.searchText;
+
+                    //const apiUrl = '/Menu/GetMenuList';
+                    const apiUrl = `/Menu/GetMenuList?startFrom=${startFrom}&noOfRecordsToFetch=${noOfRecordsToFetch}&searchText=${searchText}`;
+                    const response = await sendRequest(apiUrl, 'GET');
+
+                    if (response.isValid) {
+                        const data = response.data;
+                        tableConfig.totalItems = response.totalRowCount;
+                        const tableContainer = document.getElementById('tableDiv');
+                        tableContainer.innerHTML = '';
+                        const basicTable = await generateTable({ data, tableConfig });
+                        tableContainer.appendChild(basicTable);
+                    }
+
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            // Call the getData function
+            await getData();
+
+            async function showDataForFilter(filterData) {
+                //console.log(filterData);
+                tableConfig.itemsPerPage = filterData.itemsPerPage;
+                tableConfig.currentPage = filterData.currentPage;
+                tableConfig.searchText = filterData.searchText;
+                await getData();
+
+            };
+
+
+            function createMenuFormField() {
+
+                const nameInput = createInputFieldWithLabel({
+                    columnClass: 'col-12',
+                    type: 'text',
+                    id: 'name',
+                    labelText: 'Name',
+                    placeholder: 'Basic Setups',
+                    isRequired: true
+                });
+                const descriptionInput = createInputFieldWithLabel({
+                    columnClass: 'col-12',
+                    type: 'text',
+                    id: 'description',
+                    labelText: 'Description',
+                    placeholder: 'Description',
+                    isRequired: false
+                });
+
+                const displaySequenceInput = createInputFieldWithLabel({
+                    columnClass: 'col-12',
+                    type: 'number',
+                    id: 'displaySequence',
+                    labelText: 'Display Sequence ',
+                    placeholder: '1',
+                    isRequired: true
+                });
+
+
+                const iconOptions = [
+                    { id: 'bx bx-home-circle', name: 'bx bx-home-circle' },
+                    { id: 'bx bx-layout', name: 'bx bx-layout' },
+                    { id: 'bx bx-lock-open-alt', name: 'bx bx-lock-open-alt' },
+                    { id: 'bx bx-cube-alt', name: 'bx bx-cube-alt' },
+                ];
+                const iconSelect = createSelectFieldWithLabel({
+                    columnClass: 'col-12',
+                    id: 'icon',
+                    labelText: 'Icon',
+                    options: iconOptions,
+                    isRequired: true
+                });
+
+                const statusOptions = [
+                    { id: '1', name: 'IsActive' },
+                    { id: '0', name: 'InActive' }
+                ];
+                const statusSelect = createSelectFieldWithLabel({
+                    columnClass: 'col-12',
+                    id: 'status',
+                    labelText: 'Status',
+                    options: statusOptions,
+                    isRequired: true
+                });
+
+                return [nameInput, descriptionInput, displaySequenceInput, iconSelect, statusSelect];
+            }
+
+
+            // Example usage
+            const modalConfiguration = {
+                modalId: 'backDropModal',
+                modalTitle: 'Save Menu',
+                btnClassName: 'btn-primary',
+                buttonName: 'Save'
+            };
+
+            // Add a click event listener to the button
+            addButton.addEventListener('click', async function () {
+                const modalFormHandler = new ModalFormHandler(modalConfiguration);
+                const formFields = createMenuFormField();
+                const form = modalFormHandler.createForm(formFields);
+
+                form.submit(async (formData, modal) => {
+
+                    const apiUrl = '/Menu/PostMenu';
+                    const response = await sendRequest(apiUrl, 'POST', formData);
+
+                    showToast(response.statusCode, response.messageType, response.message);
+
+                    if (response.isValid) {
+                        getData();
+                        modal.hide();
+                    }
+                });
+            });
+
+            ////Edit
+            function showDataForEdit(rowData) {
+
+                const modalFormHandler = new ModalFormHandler(modalConfiguration);
+                const formFields = createMenuFormField();
+
+                formFields.forEach(elements => {
+                    elements.setValue(rowData[elements.id]);
+                    //content.modal_body.appendChild(elements.div);
+                });
+                const form = modalFormHandler.createForm(formFields);
+
+                form.submit(async (formData, modal) => {
+                    formData.id = rowData.id;
+                    const apiUrl = '/Menu/PutMenu';
+                    const response = await sendRequest(apiUrl, 'PUT', formData);
+
+                    showToast(response.statusCode, response.messageType, response.message);
+
+                    if (response.isValid) {
+                        getData();
+                        modal.hide();
+                    }
+                });
+            }
+
+            function showDataForDelete(rowData) {
+
+                const modalConfigurationDelete = {
+                    modalId: 'backDropModal',
+                    modalTitle: 'Delete Menu',
+                    btnClassName: 'btn-danger',
+                    buttonName: 'Yes, Delete'
+                };
+
+                const modalFormHandler = new ModalFormHandler(modalConfigurationDelete);
+                const form = modalFormHandler.createForm();
+                form.submit(async (formData, modal) => {
+
+                    const apiUrl = '/Menu/DeleteMenu/' + rowData.id;
+                    const response = await sendRequest(apiUrl, 'Delete');
+                    showToast(response.statusCode, response.messageType, response.message);
+
+                    if (response.isValid) {
+                        getData();
+                        modal.hide();
+                    }
+                });
+            };
+
+        })();
+
+
+    </script>
+}

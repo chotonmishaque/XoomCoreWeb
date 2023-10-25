@@ -1,0 +1,91 @@
+﻿@{
+    ViewData["Title"] = "EntityLog";
+}
+
+<div class="row">
+    <!-- Table -->
+    <div class="card">
+        <div class="row border-bottom">
+            <div class="col-6 text-start">
+                <h5 class="card-header">EntityLog</h5>
+            </div>
+            <div class="col-6 text-end mt-3">
+            </div>
+        </div>
+
+        <div class="text-nowrap" id="tableDiv">
+        </div>
+    </div>
+    <!--/ Table -->
+</div>
+@section scripts{
+
+    <script>
+        (async () => {
+            //
+            let tableConfig = {
+                itemsPerPage: 10,
+                totalItems: 10,
+                searchText: "",
+                currentPage: 1,
+                limitValues: ['10', '25', '50', '100'],
+                columns: [
+                    //{ key: 'menuName', label: 'Menu' },
+                    { key: 'entityName', label: 'Entity Name' },
+                    { key: 'actionType', label: 'Action Type' },
+                    { key: 'primaryRefId', label: 'Primary Ref Id' },
+                    { key: 'oldValues', label: 'Old Values' },
+                    { key: 'newValues', label: 'New Values' },
+                    { key: 'affectedColumn', label: 'Affected Column' },
+                    { key: 'username', label: 'Username' },
+                    { key: 'createdAt', label: 'Created At' },
+                    // Add more columns as needed
+                ],
+                actionButtons: [
+                    // Add more action buttons as needed
+                ],
+                filterAction: (filterData) => showDataForFilter(filterData)
+            };
+
+            // Fetch data and generate the table
+            async function getData() {
+                try {
+                    const startFrom = (tableConfig.currentPage - 1) * tableConfig.itemsPerPage + 1;
+                    const noOfRecordsToFetch = tableConfig.itemsPerPage;
+                    const searchText = tableConfig.searchText;
+
+                    //const apiUrl = '/Menu/GetMenuList';
+                    const apiUrl = `/EntityLog/GetEntityLogList?startFrom=${startFrom}&noOfRecordsToFetch=${noOfRecordsToFetch}&searchText=${searchText}`;
+                    const response = await sendRequest(apiUrl, 'GET');
+                    if (response.isValid) {
+                        console.log(response);
+                        const data = response.data;
+                        tableConfig.totalItems = response.totalRowCount;
+                        const tableContainer = document.getElementById('tableDiv');
+                        tableContainer.innerHTML = '';
+                        const basicTable = await generateTable({ data, tableConfig });
+                        tableContainer.appendChild(basicTable);
+                    }
+
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            // Call the getData function
+            await getData();
+
+            async function showDataForFilter(filterData) {
+                //console.log(filterData);
+                tableConfig.itemsPerPage = filterData.itemsPerPage;
+                tableConfig.currentPage = filterData.currentPage;
+                tableConfig.searchText = filterData.searchText;
+                await getData();
+
+            };
+
+        })();
+
+
+    </script>
+}

@@ -1,0 +1,214 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XoomCore Project Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            border-bottom: 1px solid #ccc;
+        }
+
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        code {
+            font-family: Monaco, monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>XoomCore Project Documentation</h1>
+
+    <h2>Table of Contents</h2>
+    <ul>
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#project-overview">Project Overview</a></li>
+        <li><a href="#technologies-used">Technologies Used</a></li>
+        <li><a href="#project-structure">Project Structure</a></li>
+        <li><a href="#installation">Installation</a></li>
+        <li><a href="#configuration">Configuration</a></li>
+        <li><a href="#development-guidelines">Development Guidelines</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#api-endpoints">API Endpoints</a></li>
+        <li><a href="#testing">Testing</a></li>
+        <li><a href="#deployment">Deployment</a></li>
+        <li><a href="#conclusion">Conclusion</a></li>
+        <li><a href="#acknowledgements">Acknowledgements</a></li>
+        <li><a href="#contact-information">Contact Information</a></li>
+    </ul>
+
+    <h2 id="introduction">1. Introduction</h2>
+    <h3>Purpose</h3>
+    <p>The purpose of this documentation is to provide a comprehensive overview of the XoomCore project, a .NET Core web project template designed for all developers. This document serves as a guide for developers, testers, and stakeholders involved in the project.</p>
+
+    <h3>Scope</h3>
+    <p>This documentation covers all aspects of the XoomCore project, including its architecture, features, API endpoints, testing procedures, deployment, and more. It is intended to assist team members in understanding the project and following best practices during development.</p>
+
+    <h3>Document Conventions</h3>
+    <p>Throughout this document:</p>
+    <ul>
+        <li>Code snippets and examples are presented in a monospaced font.</li>
+        <li>Square brackets [ ] indicate optional items.</li>
+        <li>"Example" denotes an example scenario or placeholder text.</li>
+    </ul>
+
+    <h3>Intended Audience</h3>
+    <p>This documentation is intended for developers, testers, project managers, and other stakeholders involved in the XoomCore project. A basic understanding of .NET Core, ASP.NET Core, Entity Framework Core, and RESTful API concepts is assumed.</p>
+
+    <h2 id="project-overview">2. Project Overview</h2>
+    <p>XoomCore is a .NET Core web project template that provides developers with a solid foundation for building web applications. It follows the principles of a layered architecture, promoting separation of concerns and modularity. Developers can use this template as a starting point for various types of web projects.</p>
+
+    <h2 id="technologies-used">3. Technologies Used</h2>
+    <p>The XoomCore project template utilizes the following technologies and frameworks:</p>
+    <ul>
+        <li>.NET Core 3.1 (or later)</li>
+        <li>ASP.NET Core 3.1 (or later)</li>
+        <li>Entity Framework Core</li>
+        <li>Serilog</li>
+        <li>Microsoft SQL Server (or another compatible database)</li>
+    </ul>
+
+    <h2 id="project-structure">4. Project Structure</h2>
+    <p>Solution Structure:</p>
+<pre><code>
+XoomCore/
+├── XoomCore.Core/
+│   ├── Entities/
+│   ├── Interfaces/
+│   │   ├── IRepository{T}.cs
+│   │   └── IUnitOfWork.cs
+│   └── Services/
+├── XoomCore.Application/
+│   ├── ViewModels/
+│   ├── RequestModels/
+│   ├── ResponseModels/
+│   ├── Responses/
+│   ├── Services/
+│   │   └── IMenuCategoryService.cs
+├── XoomCore.Infrastructure/
+│   ├── Data/
+│   │   └── AppDbContext.cs
+│   ├── Repositories/
+│   │   ├── Repository{T}.cs
+│   │   └── MenuCategoryRepository.cs
+└── XoomCore.Web/
+    ├── Controllers/
+    │   └── MenuCategoryController.cs
+    └── Startup.cs
+</code></pre>
+    <p>Layered Architecture:</p>
+    <ul>
+        <li><strong>Core Layer:</strong> Contains entities, interfaces for repositories and services, and business logic.</li>
+        <li><strong>Application Layer:</strong> Contains view models, request/response models, services, and service interfaces.</li>
+        <li><strong>Infrastructure Layer:</strong> Contains database context, repositories, and repository interfaces.</li>
+        <li><strong>Web Layer:</strong> Entry point of the application, includes controllers and startup configuration.</li>
+    </ul>
+
+    <h2 id="installation">5. Installation</h2>
+    <!-- ... -->
+
+    <h2 id="configuration">6. Configuration</h2>
+    <h3>Database Connection</h3>
+    <p>The XoomCore application uses Entity Framework Core to interact with the database. To configure the database connection, update the "DefaultConnection" value in the appsettings.json file with the appropriate connection string.</p>
+<pre><code>
+"ConnectionStrings": {
+  "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=XoomCoreDb;Trusted_Connection=True;MultipleActiveResultSets=true"
+}
+</code></pre>
+
+    <h3>Serilog Configuration</h3>
+    <p>XoomCore uses Serilog for logging. The Serilog configuration is defined in the appsettings.json file. To customize the logging behavior, update the "Serilog" section in appsettings.json.</p>
+<pre><code>
+"Serilog": {
+  "MinimumLevel": "Information",
+  "WriteTo": [
+    {
+      "Name": "Console"
+    }
+  ]
+}
+</code></pre>
+
+    <h2 id="development-guidelines">7. Development Guidelines</h2>
+    <!-- ... -->
+
+    <h2 id="features">8. Features</h2>
+    <h3>MenuCategory Entity CRUD Operations</h3>
+    <p>The XoomCore application provides CRUD operations for managing MenuCategory entities. It allows users to create, read, update, and delete menu category records through a RESTful API.</p>
+
+    <h3>Generic Repository Pattern</h3>
+    <p>The application uses the generic repository pattern to abstract data access and provide a consistent interface for data operations.</p>
+
+    <h2 id="api-endpoints">9. API Endpoints</h2>
+    <h3>Get Menu Category List</h3>
+    <p>
+        URL: /api/menu-categories<br>
+        Method: GET<br>
+        Description: Retrieves a list of all menu categories.<br>
+        Response: CommonResponse&lt;IEnumerable&lt;MenuCategoryResponse&gt;&gt;
+    </p>
+
+    <h3>Add Menu Category</h3>
+    <p>
+        URL: /api/menu-categories<br>
+        Method: POST<br>
+        Description: Adds a new menu category to the database.<br>
+        Request Body: CreateMenuCategoryRequest<br>
+        Response: CommonResponse&lt;int&gt; (The newly created menu category ID)
+    </p>
+
+    <!-- ... -->
+
+    <h2 id="testing">10. Testing</h2>
+    <h3>Unit Testing</h3>
+    <p>Unit tests are used to test individual components and methods in isolation to ensure they behave as expected.</p>
+
+    <h3>Integration Testing</h3>
+    <p>Integration tests are used to test the interaction between different components of the application, such as the interaction between controllers and services.</p>
+
+    <h2 id="deployment">11. Deployment</h2>
+    <h3>Hosting the Application</h3>
+    <p>Deploy the XoomCore application to a web server or cloud hosting platform. Ensure the appropriate environment configurations are set.</p>
+
+    <h3>Environment Configurations</h3>
+    <p>Set environment-specific configurations (e.g., connection strings, logging settings) for different deployment environments (development, production) using environment variables or configuration files.</p>
+
+    <h2 id="conclusion">12. Conclusion</h2>
+    <p>
+        <strong>Summary</strong><br>
+        The XoomCore project template provides developers with a solid foundation for building web applications using .NET Core. It follows best practices and architectural patterns to promote maintainability and scalability.
+    </p>
+
+    <h2 id="acknowledgements">13. Acknowledgements</h2>
+    <p>We would like to acknowledge the contribution of all team members who worked on this project and the support from our stakeholders.</p>
+
+    <h2 id="contact-information">14. Contact Information</h2>
+    <p><strong>For any inquiries or support related to the XoomCore project, please contact:</strong></p>
+    <p>
+        <strong>Project Manager:</strong> [Name and Email]<br>
+        <strong>Development Team:</strong> [Names and Emails]
+    </p>
+
+
+</body>
+</html>

@@ -1,0 +1,259 @@
+﻿@{
+    ViewData["Title"] = "UserRole";
+}
+
+<div class="row">
+    <!-- Table -->
+    <div class="card">
+        <div class="row">
+            <div class="col-6 text-start">
+                <h5 class="card-header">User Role</h5>
+            </div>
+            <div class="col-6 text-end mt-3">
+                <button class="btn btn-primary" type="button" id="addButton" disabled><span><i class="bx bx-plus"></i> Create New</span></button>
+            </div>
+        </div>
+
+        <div class="text-nowrap" id="tableDiv">
+        </div>
+    </div>
+    <!--/ Table -->
+</div>
+@section scripts{
+
+    <script>
+        (async () => {
+            let updatePermission = false;
+            let deletePermission = false;
+            const addButton = document.getElementById('addButton');
+
+            async function getPermittedUserRole() {
+                const apiUrl = '/UserRole/GetActionPermission';
+                const response = await sendRequest(apiUrl, 'GET');
+
+                if (response.isValid) {
+                    updatePermission = response.data.edit;
+                    deletePermission = response.data.delete;
+                    if (response.data.create) {
+                        addButton.disabled = false;
+                    }
+
+                }
+            }
+            await getPermittedUserRole();
+
+            //
+            let tableConfig = {
+                itemsPerPage: 10,
+                totalItems: 10,
+                searchText: "",
+                currentPage: 1,
+                limitValues: ['10', '25', '50', '100'],
+                columns: [
+                    { key: 'username', label: 'Username' },
+                    { key: 'roleName', label: 'RoleName' },
+                    {
+                        key: 'status',
+                        label: 'Status',
+                        renderElement: rowData => getStatusElement(rowData, 'status'),
+                    },
+                    // Add more columns as needed
+                ],
+                actionButtons: [
+                    {
+                        label: 'Edit',
+                        icon: 'bx-edit',
+                        style: 'btn-outline-primary me-1',
+                        enabled: updatePermission,
+                        action: (rowData) => showDataForEdit(rowData),
+                    },
+                    {
+                        label: 'Delete',
+                        icon: 'bx-trash',
+                        style: 'btn-outline-danger me-1',
+                        enabled: deletePermission,
+                        action: (rowData) => showDataForDelete(rowData),
+
+                    },
+                    // Add more action buttons as needed
+                ],
+
+                filterAction: (filterData) => showDataForFilter(filterData)
+            }
+
+
+            async function getData() {
+                try {
+                    const startFrom = (tableConfig.currentPage - 1) * tableConfig.itemsPerPage + 1;
+                    const noOfRecordsToFetch = tableConfig.itemsPerPage;
+                    const searchText = tableConfig.searchText;
+
+                    //const apiUrl = '/Menu/GetMenuList';
+                    const apiUrl = `/UserRole/GetUserRoleList?startFrom=${startFrom}&noOfRecordsToFetch=${noOfRecordsToFetch}&searchText=${searchText}`;
+                    const response = await sendRequest(apiUrl, 'GET');
+
+                    if (response.isValid) {
+                        const data = response.data;
+                        tableConfig.totalItems = response.totalRowCount;
+                        const tableContainer = document.getElementById('tableDiv');
+                        tableContainer.innerHTML = '';
+                        const basicTable = await generateTable({ data, tableConfig });
+                        tableContainer.appendChild(basicTable);
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            // Call the getData function
+            await getData();
+
+            async function showDataForFilter(filterData) {
+                //console.log(filterData);
+                tableConfig.itemsPerPage = filterData.itemsPerPage;
+                tableConfig.currentPage = filterData.currentPage;
+                tableConfig.searchText = filterData.searchText;
+                await getData();
+
+            };
+
+            let userListArr = [];
+            async function getUserList() {
+                const apiUrl = '/User/GetUserListForSelect';
+                const response = await sendRequest(apiUrl, 'GET');
+
+                if (response.isValid) {
+                    userListArr = response.data;
+                }
+            }
+            await getUserList();
+
+            let roleListArr = [];
+            async function getRoleList() {
+                const apiUrl = '/Role/GetRoleListForSelect';
+                const response = await sendRequest(apiUrl, 'GET');
+
+                if (response.isValid) {
+                    roleListArr = response.data;
+                }
+            }
+            await getRoleList();
+
+
+            function createUserRoleFormField() {
+
+                const userSelect = createSelectFieldWithLabel({
+                    columnClass: 'col-12',
+                    id: 'userId',
+                    labelText: 'User',
+                    options: userListArr,
+                    isRequired: true
+                });
+
+                const roleSelect = createSelectFieldWithLabel({
+                    columnClass: 'col-12',
+                    id: 'roleId',
+                    labelText: 'Role',
+                    options: roleListArr,
+                    isRequired: true
+                });
+                const statusOptions = [
+                    { id: '1', name: 'IsActive' },
+                    { id: '0', name: 'InActive' }
+                ];
+
+                const statusSelect = createSelectFieldWithLabel({
+                    columnClass: 'col-12',
+                    id: 'status',
+                    labelText: 'Status',
+                    options: statusOptions,
+                    isRequired: true
+                });
+
+                return [userSelect, roleSelect, statusSelect];
+            }
+
+
+            // Example usage
+            const modalConfiguration = {
+                modalId: 'backDropModal',
+                modalTitle: 'Save UserRole',
+                btnClassName: 'btn-primary',
+                buttonName: 'Save'
+            };
+
+            // Add a click event listener to the button
+            addButton.addEventListener('click', async function () {
+                const modalFormHandler = new ModalFormHandler(modalConfiguration);
+                const formFields = createUserRoleFormField();
+                const form = modalFormHandler.createForm(formFields);
+
+                form.submit(async (formData, modal) => {
+
+                    const apiUrl = '/UserRole/PostUserRole';
+                    const response = await sendRequest(apiUrl, 'POST', formData);
+
+                    showToast(response.statusCode, response.messageType, response.message);
+
+                    if (response.isValid) {
+                        getData();
+                        modal.hide();
+                    }
+                });
+            });
+
+            ////Edit
+            function showDataForEdit(rowData) {
+
+                const modalFormHandler = new ModalFormHandler(modalConfiguration);
+                const formFields = createUserRoleFormField();
+
+                formFields.forEach(elements => {
+                    elements.setValue(rowData[elements.id]);
+                    //content.modal_body.appendChild(elements.div);
+                });
+                const form = modalFormHandler.createForm(formFields);
+
+                form.submit(async (formData, modal) => {
+                    formData.id = rowData.id;
+                    const apiUrl = '/UserRole/PutUserRole';
+                    const response = await sendRequest(apiUrl, 'PUT', formData);
+
+                    showToast(response.statusCode, response.messageType, response.message);
+
+                    if (response.isValid) {
+                        getData();
+                        modal.hide();
+                    }
+                });
+            }
+
+            function showDataForDelete(rowData) {
+
+                const modalConfigurationDelete = {
+                    modalId: 'backDropModal',
+                    modalTitle: 'Delete UserRole',
+                    btnClassName: 'btn-danger',
+                    buttonName: 'Yes, Delete'
+                };
+
+                const modalFormHandler = new ModalFormHandler(modalConfigurationDelete);
+                const form = modalFormHandler.createForm();
+                form.submit(async (formData, modal) => {
+
+                    const apiUrl = '/UserRole/DeleteUserRole/' + rowData.id;
+                    const response = await sendRequest(apiUrl, 'Delete');
+                    showToast(response.statusCode, response.messageType, response.message);
+
+                    if (response.isValid) {
+                        getData();
+                        modal.hide();
+                    }
+                });
+            };
+
+        })();
+
+
+    </script>
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Choton Mohammad Ishaque",
+  "classifications": ["Web", "Linux", "macOS", "Windows", "Service", "Onion Architecture", "Entity Framework Core"],
+  "name": "XoomCoreWeb",
+  "identity": "XoomCoreWeb",
+  "shortName": "XoomCoreWeb",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "preferNameDirectory": true,
+  "sourceName": "XoomCore",
+  "description": "A boilerplate ASP.NET Core application using Onion Architecture with Access Control Module.",
+  "version": "1.0.0"
+}

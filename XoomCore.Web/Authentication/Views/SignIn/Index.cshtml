@@ -1,0 +1,331 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+    <title>Sign In</title>
+
+    <meta name="description" content="" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../assets/img/logo/_logo.png" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
+          rel="stylesheet" />
+
+    <!-- Icons. Uncomment required icon fonts -->
+    <link rel="stylesheet" href="../assets/vendor/fonts/boxicons.css" />
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="../assets/vendor/css/core.css" class="template-customizer-core-css" />
+    <link rel="stylesheet" href="../assets/vendor/css/theme-default.css" class="template-customizer-theme-css" />
+    <link rel="stylesheet" href="../assets/css/demo.css" />
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+
+    <!-- Page CSS -->
+    <!-- Page -->
+    <link rel="stylesheet" href="../assets/vendor/css/pages/page-auth.css" />
+    <!-- Helpers -->
+    <script src="../assets/vendor/js/helpers.js"></script>
+</head>
+
+<body>
+    <!-- Content -->
+
+    <div class="container-xxl">
+        <div class="authentication-wrapper authentication-basic container-p-y">
+            <div class="authentication-inner">
+                <!-- Register Card -->
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Logo -->
+                        <div class="app-brand justify-content-center">
+                            <a href="/" class="app-brand-link gap-2">
+                                <span class="app-brand-logo demo">
+                                    @*<img width="100px" src="~/assets/img/logo/_logo.png" />*@
+                                    <img width="100px" src="~/x-logo.png" />
+                                </span>
+
+                            </a>
+                        </div>
+                        <!-- /Logo -->
+                        <h4 class="mb-2">Sign In 🚀</h4>
+                        <p class="mb-4">XoomCore</p>
+                        <form id="user_sign_in_form" name="user_sign_in_form" class="form-inline needs-validation" novalidate>
+                            <div class="row mt-3">
+
+                                <div class="form-group mb-2">
+                                    <label for="helpInputTop" class="asterisk">Email</label>
+                                    <small class="text-muted"><i>someone@gmail.com</i></small>
+                                    <input type="email" class="form-control form-control-xl" id="email_address" name="email_address" placeholder="Enter Your Email" required>
+                                    <div class="invalid-feedback">
+                                        Please enter your email.
+                                    </div>
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="helpInputTop" class="asterisk">Password</label>
+                                    <small class="text-muted" id="password_label"></small>
+                                    <input type="password" class="form-control form-control-xl" id="password" name="password" placeholder="Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" required>
+                                    <div class="invalid-feedback">
+                                        Your password must have at least 8 characters and contain at least one uppercase letter,one lowercase letter and one number.
+                                    </div>
+                                </div>
+                                <div class="form-group mt-3 mb-2">
+                                    <button type="submit" class="btn btn-success w-100" id="sign_in_btn">Sign In</button>
+                                </div>
+
+                            </div>
+                        </form>
+                        <p class="text-center mt-3">
+                            <span>New on our platform?</span>
+                            <a href="#">
+                                <span>Create an account</span>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+                <!-- Register Card -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Core JS -->
+    <!-- build:js assets/vendor/js/core.js -->
+    <script src="../assets/vendor/libs/jquery/jquery.js"></script>
+    <script src="../assets/vendor/libs/popper/popper.js"></script>
+    <script src="../assets/vendor/js/bootstrap.js"></script>
+    <script src="../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+
+    <script src="../assets/vendor/js/menu.js"></script>
+    <!-- endbuild -->
+    <!-- Vendors JS -->
+    <!-- Main JS -->
+    <script src="../assets/js/main.js"></script>
+
+    <script>
+        // Example starter JavaScript for disabling form submissions if there are invalid fields
+        (() => {
+            'use strict';
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            const forms = document.querySelectorAll('.needs-validation');
+            // Loop over them and prevent submission
+            Array.prototype.slice.call(forms).forEach((form) => {
+                form.addEventListener('submit', (event) => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
+    <script>
+
+
+        // Create a container for the toasts
+        const toastContainer = document.createElement('div');
+        toastContainer.classList.add('toast-container');
+        toastContainer.style.zIndex = 9999;
+
+        document.body.appendChild(toastContainer);
+
+        // Function to create and show a toast
+        function toastMessage({ className, responseCode, title, message }) {
+            // Create the toast element
+            const toastPlacementExample = document.createElement('div');
+            toastPlacementExample.classList.add('bs-toast', 'toast', 'toast-placement-ex', 'end-0', 'm-2', className, 'show');
+            toastPlacementExample.setAttribute('role', 'alert');
+            toastPlacementExample.setAttribute('aria-live', 'assertive');
+            toastPlacementExample.setAttribute('aria-atomic', 'true');
+            toastPlacementExample.setAttribute('data-delay', '2000');
+
+            // Create the toast header
+            const toastHeader = document.createElement('div');
+            toastHeader.classList.add('toast-header');
+
+            const toastIcon = document.createElement('i');
+            toastIcon.classList.add('bx', 'bx-bell', 'me-2');
+            toastHeader.appendChild(toastIcon);
+
+            const toastTitle = document.createElement('div');
+            toastTitle.classList.add('me-auto', 'fw-semibold');
+            toastTitle.textContent = title;
+            toastHeader.appendChild(toastTitle);
+
+            const toastTimestamp = document.createElement('small');
+            toastTimestamp.textContent = 'Response Code : ' + responseCode;
+            toastHeader.appendChild(toastTimestamp);
+
+            const toastCloseBtn = document.createElement('button');
+            toastCloseBtn.classList.add('btn-close');
+            toastCloseBtn.setAttribute('type', 'button');
+            toastCloseBtn.setAttribute('data-bs-dismiss', 'toast');
+            toastCloseBtn.setAttribute('aria-label', 'Close');
+            toastHeader.appendChild(toastCloseBtn);
+
+            // Create the toast body
+            const toastBody = document.createElement('div');
+            toastBody.classList.add('toast-body');
+            toastBody.textContent = message;
+
+            // Add the header and body to the toast element
+            toastPlacementExample.appendChild(toastHeader);
+            toastPlacementExample.appendChild(toastBody);
+
+            // Add the toast element to the container
+            toastContainer.appendChild(toastPlacementExample);
+
+            // Show the toast
+            const toastPlacement = new bootstrap.Toast(toastPlacementExample);
+            toastPlacement.show();
+
+            // Move existing toasts up
+            const toasts = toastContainer.querySelectorAll('.bs-toast');
+            let offset = 0;
+            for (let i = 0; i < toasts.length; i++) {
+                const toast = toasts[i];
+                toast.style.bottom = `${offset}px`;
+                offset += toast.offsetHeight + 10;
+            }
+
+            // Remove the toast element from the container after a certain amount of time
+            setTimeout(() => {
+                toastPlacement.dispose();
+                toastContainer.removeChild(toastPlacementExample);
+            }, 10000);
+        }
+
+        function showToast(responseCode, messageType, message) {
+            switch (messageType) {
+                case "Success":
+                    toastMessage({ className: 'bg-primary', responseCode: responseCode, title: messageType, message: message })
+                    break;
+                case "Warning":
+                    toastMessage({ className: 'bg-warning', responseCode: responseCode, title: messageType, message: message })
+                    break;
+                case "Error":
+                    toastMessage({ className: 'bg-danger', responseCode: responseCode, title: messageType, message: message })
+                    break;
+                default:
+                    toastMessage({ className: 'bg-secondary', responseCode: responseCode, title: messageType, message: message })
+                    break;
+            }
+
+        }
+
+
+
+
+        function user_sign_in() {
+
+
+            var json = {
+                Email: $("#email_address").val(),
+                Password: $("#password").val()
+            };
+            console.log(json);
+            return;
+            $.ajax({
+                url: "/PostUserSignIn",
+                type: "POST",
+                data: json,
+                success: function (response) {
+                    if (response.error) {
+
+                        showToast(response.responseCode, response.messageType, response.message);
+
+                    }
+                    else {
+                        location.href = response.url;
+                    }
+                },
+                error: function (a, b, err) {
+                    showToast("", "Error", "Error");
+
+                },
+                beforeSend: function () {
+                    $("#sign_in_btn").empty();
+                    $("#sign_in_btn").append('<img src="/assets/vendor/svg-loaders/circles.svg" class="text text-white" style="width: 1.5rem;height:1.5rem" alt="audio">');
+
+                },
+                complete: function () {
+                    $("#sign_in_btn").empty();
+                    $("#sign_in_btn").append('Sign In');
+
+                }
+            });
+        };
+
+        let spinnerBtn = document.getElementById("sign_in_btn");
+        async function sendRequest(url, method, data) {
+            try {
+
+                // Show the spinner
+                spinnerBtn.innerHTML = '<img src="/assets/vendor/svg-loaders/circles.svg" class="text text-white" style="width: 1.5rem;height:1.5rem" alt="audio">';
+
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+                const response = await fetch(url, options);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error(error);
+            }
+            finally {
+                spinnerBtn.innerHTML = 'Sign In';
+            }
+        };
+        // DOM Ready
+        document.addEventListener("DOMContentLoaded", async function () {
+            document.getElementById("user_sign_in_form").addEventListener("submit",async function (e) {
+                e.preventDefault();
+                var form = document.getElementById("user_sign_in_form");
+                if (!form.checkValidity()) {
+                    e.stopPropagation();
+                } else {
+
+                    var json = {
+                        Email: $("#email_address").val(),
+                        Password: $("#password").val()
+                    };
+                    // Fetch menu data using sendRequest
+                    const getUserUrl = "/PostUserSignIn";
+                    const response = await sendRequest(getUserUrl, "POST", json);
+
+                    if (!response.isValid) {
+                        showToast(response.responseCode, response.messageType, response.message);
+                    }
+                    else {
+                        location.href = response.data.url;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

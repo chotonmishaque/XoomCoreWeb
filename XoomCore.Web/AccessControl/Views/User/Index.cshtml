@@ -1,0 +1,341 @@
+﻿@{
+    ViewData["Title"] = "User";
+}
+<div class="row">
+    <!-- Table -->
+    <div class="card">
+        <div class="row">
+            <div class="col-6 text-start">
+                <h5 class="card-header">User</h5>
+            </div>
+            <div class="col-6 text-end mt-3">
+                <button class="btn btn-primary" type="button" id="addButton" disabled><span><i class="bx bx-plus"></i> Create New</span></button>
+            </div>
+        </div>
+
+        <div class="text-nowrap" id="tableDiv">
+        </div>
+    </div>
+    <!--/ Table -->
+</div>
+@section scripts{
+
+    <script>
+        (async () => {
+            let updatePermission = false;
+            let changeUserPasswordPermission = false;
+            let deletePermission = false;
+            const addButton = document.getElementById('addButton');
+
+            async function getPermittedMenuItem() {
+                const apiUrl = '/User/GetActionPermission';
+                const response = await sendRequest(apiUrl, 'GET');
+
+                if (response.isValid) {
+                    updatePermission = response.data.edit;
+                    changeUserPasswordPermission = response.data.changeUserPassword;
+                    deletePermission = response.data.delete;
+                    if (response.data.create) {
+                        addButton.disabled = false;
+                    }
+
+                }
+            }
+            await getPermittedMenuItem();
+
+            //
+            let tableConfig = {
+                itemsPerPage: 10,
+                totalItems: 10,
+                searchText: "",
+                currentPage: 1,
+                limitValues: ['10', '25', '50', '100'],
+                columns: [
+                    { key: 'username', label: 'User Name' },
+                    { key: 'email', label: 'Email' },
+                    { key: 'fullName', label: 'FullName' },
+                    { key: 'phoneNumber', label: 'Phone Number' },
+                    {
+                        key: 'status',
+                        label: 'Status',
+                        renderElement: rowData => getUserStatusElement(rowData, 'status'),
+                    },
+                    // Add more columns as needed
+                ],
+                actionButtons: [
+                    {
+                        label: 'Edit',
+                        icon: 'bx-edit',
+                        style: 'btn-outline-primary me-1',
+                        enabled: updatePermission,
+                        action: (rowData) => showDataForEdit(rowData),
+                    },
+                    {
+                        label: 'Change Password',
+                        icon: 'bx-lock',
+                        style: 'btn-outline-info me-1',
+                        enabled: changeUserPasswordPermission,
+                        action: (rowData) => showDataForChangePassword(rowData),
+
+                    },
+                    {
+                        label: 'Delete',
+                        icon: 'bx-trash',
+                        style: 'btn-outline-danger me-1',
+                        enabled: deletePermission,
+                        action: (rowData) => showDataForDelete(rowData),
+
+                    }
+                    // Add more action buttons as needed
+                ],
+
+                filterAction: (filterData) => showDataForFilter(filterData)
+            }
+
+            function getUserStatusElement(obj, key) {
+                let statusName = document.createElement('span');
+                switch (obj[key]) {
+                    case 1:
+                        statusName.className = "badge bg-label-primary me-1";
+                        statusName.innerHTML = "IsActive";
+                        break;
+                    case 0:
+                        statusName.className = "badge bg-label-danger me-1";
+                        statusName.innerHTML = "InActive";
+                        break;
+                    default:
+                        statusName.className = "badge bg-label-danger me-1";
+                        statusName.innerHTML = "Suspended";
+                }
+                return statusName;
+            }
+            // Fetch data and generate the table
+            async function getData() {
+                try {
+                    const startFrom = (tableConfig.currentPage - 1) * tableConfig.itemsPerPage + 1;
+                    const noOfRecordsToFetch = tableConfig.itemsPerPage;
+                    const searchText = tableConfig.searchText;
+
+                    //const apiUrl = '/Menu/GetMenuList';
+                    const apiUrl = `/User/GetUserList?startFrom=${startFrom}&noOfRecordsToFetch=${noOfRecordsToFetch}&searchText=${searchText}`;
+                    const response = await sendRequest(apiUrl, 'GET');
+
+                    if (response.isValid) {
+                        const data = response.data;
+                        tableConfig.totalItems = response.totalRowCount;
+                        const tableContainer = document.getElementById('tableDiv');
+                        tableContainer.innerHTML = '';
+                        const basicTable = await generateTable({ data, tableConfig });
+                        tableContainer.appendChild(basicTable);
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            // Call the getData function
+            await getData();
+
+            function createUserFormField() {
+
+
+                const usernameInput = createInputFieldWithLabel({
+                    columnClass: 'col-12',
+                    type: 'text',
+                    id: 'username',
+                    labelText: 'User Name',
+                    placeholder: 'Admin',
+                    isRequired: true
+                });
+                const emailInput = createInputFieldWithLabel({
+                    columnClass: 'col-12',
+                    type: 'email',
+                    id: 'email',
+                    labelText: 'Email',
+                    placeholder: 'admin@gmail.com',
+                    isRequired: true
+                });
+
+                const fullNameInput = createInputFieldWithLabel({
+                    columnClass: 'col-12',
+                    type: 'text',
+                    id: 'fullName',
+                    labelText: 'Full Name',
+                    placeholder: 'Admin',
+                    isRequired: true
+                });
+                
+
+                const phoneNumberInput = createInputFieldWithLabel({
+                    columnClass: 'col-12',
+                    type: 'text',
+                    id: 'phoneNumber',
+                    labelText: 'Phone Number',
+                    placeholder: 'Phone Number',
+                    isRequired: true
+                });
+
+                const statusOptions = [
+                    { id: '1', name: 'IsActive' },
+                    { id: '0', name: 'InActive' },
+                    { id: '2', name: 'Suspended' }
+                ];
+
+                const statusSelect = createSelectFieldWithLabel({
+                    columnClass: 'col-12',
+                    id: 'status',
+                    labelText: 'Status',
+                    options: statusOptions,
+                    isRequired: true
+                });
+
+                return [usernameInput, emailInput, fullNameInput, phoneNumberInput, statusSelect];
+            }
+
+
+            // Example usage
+            const modalConfiguration = {
+                modalId: 'backDropModal',
+                modalTitle: 'Save User',
+                btnClassName: 'btn-primary',
+                buttonName: 'Save'
+            };
+
+            // Add a click event listener to the button
+            addButton.addEventListener('click', async function () {
+                const modalFormHandler = new ModalFormHandler(modalConfiguration);
+                const formFields = createUserFormField();
+                const form = modalFormHandler.createForm(formFields);
+
+                form.submit(async (formData, modal) => {
+
+                    const apiUrl = '/User/PostUser';
+                    const response = await sendRequest(apiUrl, 'POST', formData);
+
+                    showToast(response.statusCode, response.messageType, response.message);
+
+                    if (response.isValid) {
+                        getData();
+                        modal.hide();
+                    }
+                });
+            });
+
+            ////Edit
+            function showDataForEdit(rowData) {
+
+                const modalFormHandler = new ModalFormHandler(modalConfiguration);
+                const formFields = createUserFormField();
+
+                formFields.forEach(elements => {
+                    elements.setValue(rowData[elements.id]);
+                    //content.modal_body.appendChild(elements.div);
+                });
+                const form = modalFormHandler.createForm(formFields);
+
+                form.submit(async (formData, modal) => {
+                    formData.id = rowData.id;
+                    const apiUrl = '/User/PutUser';
+                    const response = await sendRequest(apiUrl, 'PUT', formData);
+
+                    showToast(response.statusCode, response.messageType, response.message);
+
+                    if (response.isValid) {
+                        getData();
+                        modal.hide();
+                    }
+                });
+            };
+
+
+            function changePasswordFormField() {
+
+
+                const usernameInput = createInputFieldWithLabel({
+                    columnClass: 'col-12',
+                    type: 'text',
+                    id: 'username',
+                    labelText: 'User Name',
+                    placeholder: 'Admin',
+                    isReadOnly:true,
+                    isRequired: true
+                });
+
+                const passwordInput = createInputFieldWithLabel({
+                    columnClass: 'col-12',
+                    type: 'password',
+                    id: 'newPassword',
+                    labelText: 'New Password',
+                    placeholder: 'New Password',
+                    isRequired: true
+                });
+                return [usernameInput, passwordInput];
+            }
+
+            function showDataForChangePassword(rowData) {
+
+                const modalFormHandler = new ModalFormHandler({
+                    modalId: 'backDropModal',
+                    modalTitle: 'Change User Password',
+                    btnClassName: 'btn-info',
+                    buttonName: 'Change Password'
+                });
+                const formFields = changePasswordFormField();
+
+                formFields.forEach(elements => {
+                    if (elements.id == 'username') {
+                        elements.setValue(rowData['username']);
+                    }
+                    else if (elements.id == 'newPassword') {
+                        elements.inputElement.pattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d).{8,}$";
+                        elements.invalidFeedbackElement.textContent = "Your password must have at least 8 characters and contain at least one uppercase letter,one lowercase letter and one number.";
+
+                    }
+                });
+                const form = modalFormHandler.createForm(formFields);
+
+                form.submit(async (formData, modal) => {
+                    formData.id = rowData.id;
+                    delete formData['username'];
+
+                    const apiUrl = '/User/ChangeUserPassword';
+                    const response = await sendRequest(apiUrl, 'PUT', formData);
+
+                    showToast(response.statusCode, response.messageType, response.message);
+
+                    if (response.isValid) {
+                        getData();
+                        modal.hide();
+                    }
+                });
+            }
+
+            function showDataForDelete(rowData) {
+
+                const modalConfigurationDelete = {
+                    modalId: 'backDropModal',
+                    modalTitle: 'Delete User',
+                    btnClassName: 'btn-danger',
+                    buttonName: 'Yes, Delete'
+                };
+
+                const modalFormHandler = new ModalFormHandler(modalConfigurationDelete);
+                const form = modalFormHandler.createForm();
+                form.submit(async (formData, modal) => {
+
+                    const apiUrl = '/User/DeleteUser/' + rowData.id;
+                    const response = await sendRequest(apiUrl, 'Delete');
+                    showToast(response.statusCode, response.messageType, response.message);
+
+                    if (response.isValid) {
+                        getData();
+                        modal.hide();
+                    }
+                });
+            };
+
+        })();
+
+
+    </script>
+}

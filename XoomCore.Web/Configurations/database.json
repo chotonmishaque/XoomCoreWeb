@@ -1,0 +1,6 @@
+{
+  "DatabaseSettings": {
+    "DBProvider": "mssql",
+    "ConnectionString": "Server=ServerName;Integrated Security=SSPI;Database=XoomCoreDb;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True;User Id=your_user_id;password=your_password"
+  }
+}
