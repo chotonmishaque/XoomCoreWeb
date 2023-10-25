@@ -97,7 +97,7 @@ Before you get started with the XoomCore project template, make sure you have th
 
 ## 4. Configuration
 
-### Database Connection
+### 4.1 Database Connection
 
 The XoomCore application relies on Entity Framework Core Code First Approach to interact with the database. To configure the database connection, follow these steps:
 
@@ -112,7 +112,7 @@ The XoomCore application relies on Entity Framework Core Code First Approach to 
     }
     ```
 
-### Applying Migrations
+### 4.2 Applying Migrations
 
 To create and update your database using Entity Framework migrations, follow these steps:
 1. Open the Package Manager Console in Visual Studio via `View > Other Windows > Package Manager Console`.
@@ -125,7 +125,7 @@ To create and update your database using Entity Framework migrations, follow the
 
 You're all set! You now have a new project based on the XoomCore template, and you're ready to start building your application. Happy coding!
 
-### USER CREDENTIALS
+### 4.3 USER CREDENTIALS
 
 Admin:
 ```json
@@ -144,47 +144,47 @@ User:
 ```
 ## 5. Development Guidelines
 
-### Coding Standards
+### 5.1 Coding Standards
 Follow the C# coding standards and guidelines outlined by Microsoft to maintain consistent and readable code.
 
-### Naming Conventions
+### 5.2 Naming Conventions
 Adhere to the following naming conventions:
 - Class names should be in PascalCase.
 - Interface names should begin with "I" and use PascalCase.
 - Method names should be in PascalCase.
 - Property names should be in PascalCase.
 
-### Logging
+### 5.3 Logging
 Utilize Serilog for logging throughout the application to track important events and errors.
 
 ## 6. Features
 
-### User Module
+### 6.1 User Module
 The XoomCore application provides a User Module for managing users, including action permissions.
 
-### Generic Repository Pattern
+### 6.2 Generic Repository Pattern
 The application uses the generic repository pattern to abstract data access and provide a consistent interface for data operations.
 
-### Common Response Model
+### 6.3 Common Response Model
 API responses follow a common response model (`CommonResponse<T>`) to provide a unified structure for success and error responses.
 
-### Request and Response Models
+### 6.4 Request and Response Models
 Request and response models are used to validate and transfer data between the client and server.
 
-### Audit Log for Data Changes
+### 6.5 Audit Log for Data Changes
 The application includes an `EntityLogEntity` to record data changes in the database. It is implemented in the `SaveChangesAsync` method of the `ApplicationDbContext`.
 
 ## 7. Conclusion
 
-### Summary
+### 7.1 Summary
 
 The XoomCore project is a .NET Core web application that follows best practices and the Onion Architecture pattern. It include the User Module, which enables comprehensive user management with action permissions, and the use of the generic repository pattern, ensuring efficient and consistent data access. The application adopts a common response model (CommonResponse<T>) for API interactions and employs request and response models for secure data transfer. Additionally, an audit log mechanism tracks data changes in the database, further enhancing data integrity and accountability.
 
-### UI Template
+### 7.2 UI Template
 
-We'd also like to acknowledge the use of the Sneat Bootstrap HTML Admin Template for the project's UI design.
+We'd also like to acknowledge the use of the [Sneat Bootstrap HTML Admin Template for the project's UI design](https://github.com/themeselection/sneat-bootstrap-html-admin-template-free)
 
-### License
+### 7.3 License
 
 This project is licensed under the [MIT License](https://github.com/chotonmishaque/XoomCoreWeb/blob/master/LICENSE.txt).
 
