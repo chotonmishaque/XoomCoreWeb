@@ -81,7 +81,7 @@ Before you get started with the XoomCore project template, make sure you have th
 
 ### 3.2 Install the XoomCore Template
 
-1. Visit the [Visual Studio Marketplace page for the XoomCoreWeb template](https://marketplace.visualstudio.com/items?itemName=chotonmishaque.XoomCoreWeb&ssr=false#overview).
+1. Visit the [Visual Studio Marketplace page for the XoomCoreWeb template](https://marketplace.visualstudio.com/items?itemName=chotonmishaque.XoomCoreWeb).
 2. Click the "Download" button to obtain the template in the form of a VSIX file.
 3. Once the download is complete, locate the downloaded VSIX file on your computer.
 4. Double-click the downloaded VSIX file. This action will open Visual Studio and prompt you to install the template.
